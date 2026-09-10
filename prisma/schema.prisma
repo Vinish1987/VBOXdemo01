@@ -13,6 +13,9 @@
 
 generator client {
   provider = "prisma-client-js"
+  // "native" = your own computer. "rhel-openssl-3.0.x" = the servers Vercel
+  // runs on. Listing both means the app works locally AND when deployed.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
