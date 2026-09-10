@@ -1,13 +1,21 @@
+import "./globals.css";
+import type { ReactNode } from "react";
+import { AuthProvider } from "@/components/Auth";
+import { Nav } from "@/components/Nav";
+
 export const metadata = {
-  title: "VBOX API",
-  description: "VBOX streaming platform — backend",
+  title: "VBOX — Watch web series",
+  description: "VBOX streaming platform",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: "system-ui, sans-serif", background: "#0a0912", color: "#f5f2fb" }}>
-        {children}
+      <body>
+        <AuthProvider>
+          <Nav />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -32,6 +32,22 @@ export async function requireUser(req: Request) {
   return user;
 }
 
+/** The subset of a user the permission rules (src/lib/rbac.ts) need. */
+export function principalOf(user: {
+  id: string;
+  role: "VIEWER" | "CREATOR" | "ADMIN";
+  creatorStatus: "NONE" | "PENDING" | "APPROVED" | "REJECTED";
+}) {
+  return { id: user.id, role: user.role, creatorStatus: user.creatorStatus };
+}
+
+/** Require the signed-in user to be an ADMIN; throws 401/403 otherwise. */
+export async function requireAdmin(req: Request) {
+  const user = await requireUser(req);
+  if (user.role !== "ADMIN") throw fail(403, "Admin access only");
+  return user;
+}
+
 /** Turn a caught value into a Response (our thrown 401s pass straight through). */
 export function toResponse(err: unknown): Response {
   if (err instanceof Response) return err;

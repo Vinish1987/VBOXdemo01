@@ -55,12 +55,16 @@ npm run db:seed
 npm run dev
 ```
 
-Now open **http://localhost:3000** — you'll see a status page listing every
-part of the system. The server is live.
+Now open **http://localhost:3000** — you'll see the **actual VBOX app**: a home
+page with the series catalog. Sign up or log in, open a series, watch Episode 1
+free, hit a locked episode, and unlock it with credits or go Premium — the whole
+viewer experience, running on the real backend.
 
-**Demo logins** (password for both is `password123`):
+**Demo logins** (password for all is `password123`):
 - `viewer@vbox.test` — a normal viewer, starts with 60 VBOX Credits
-- `creator@vbox.test` — owns the sample catalog (the Creator Studio side)
+- `creator@vbox.test` — an **approved** creator (owns the sample catalog)
+- `admin@vbox.test` — platform **admin** (approves creators, moderates, sees all numbers)
+- `applicant@vbox.test` — a viewer with a **pending** creator application to approve
 
 > No Docker? You can instead create a free cloud database at **neon.tech** or
 > **supabase.com**, copy its connection string into the `.env` file as
@@ -122,9 +126,32 @@ src/app/api/         ← the endpoints the apps/website will call
 test/                ← automated tests for the engine (run: npm test)
 ```
 
-Run `npm test` any time to confirm the core rules still work (19 checks).
+There's also a front-end now (Phase 3): the pages under `src/app/` (`page.tsx`
+home, `series/`, `watch/`, `login/`, `signup/`, `plans/`, `wallet/`) are the real
+viewer app, built with React and wired to the API above. Shared UI lives in
+`src/components/` and the styling in `src/app/globals.css`.
+
+Run `npm test` any time to confirm the core rules still work (26 checks).
 
 ---
+
+## Roles & permissions (Phase 1)
+
+Three roles, with real guard-rails enforced in `src/lib/rbac.ts` (and tested):
+
+- **Viewer** — browses, watches per their plan, subscribes, buys credits.
+- **Creator** — uploads and manages **their own** content, sees their own
+  earnings. Crucially, being a creator isn't automatic: a viewer **applies**
+  (`POST /api/creator/apply`), and an **admin approves** before they can upload.
+- **Admin** — approves creators, reviews content, manages ads, handles money,
+  and sees platform-wide numbers.
+
+Try it: log in as `applicant@vbox.test`, then as `admin@vbox.test` call
+`GET /api/admin/creator-applications` and approve them via
+`POST /api/admin/creator-applications/:id` with `{"decision":"APPROVE"}`.
+
+Still to come in this phase: email/phone verification and password reset (the
+database is already set up for them).
 
 ## What's built vs. what's next
 

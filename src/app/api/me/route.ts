@@ -13,6 +13,8 @@ export async function GET(req: Request) {
         email: user.email,
         name: user.name,
         role: user.role,
+        creatorStatus: user.creatorStatus,
+        emailVerified: !!user.emailVerified,
         creditsBalance: user.creditsBalance,
       },
       subscription: sub

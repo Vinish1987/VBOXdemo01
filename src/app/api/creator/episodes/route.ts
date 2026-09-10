@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { requireUser, ok, fail, toResponse } from "@/lib/http";
+import { requireUser, ok, fail, toResponse, principalOf } from "@/lib/http";
+import { canUpload, canManageSeries } from "@/lib/rbac";
 
 export const runtime = "nodejs";
 
@@ -18,16 +19,13 @@ const CreateBody = z.object({
   videoKey: z.string().optional(),
 });
 
-function ensureCreator(role: string): Response | null {
-  if (role !== "CREATOR" && role !== "ADMIN") return fail(403, "Creator access only");
-  return null;
-}
-
 export async function POST(req: Request) {
   try {
     const user = await requireUser(req);
-    const gate = ensureCreator(user.role);
-    if (gate) return gate;
+    // Must be an APPROVED creator (or admin) — the role alone isn't enough.
+    if (!canUpload(principalOf(user))) {
+      return fail(403, "Your creator account isn't approved for uploads yet");
+    }
 
     const parsed = CreateBody.safeParse(await req.json());
     if (!parsed.success) return fail(400, parsed.error.issues[0].message);
@@ -35,7 +33,7 @@ export async function POST(req: Request) {
 
     const series = await prisma.series.findUnique({ where: { id: d.seriesId } });
     if (!series) return fail(404, "Series not found");
-    if (user.role !== "ADMIN" && series.creatorId !== user.id) {
+    if (!canManageSeries(principalOf(user), series.creatorId)) {
       return fail(403, "You don't own this series");
     }
 
@@ -70,8 +68,9 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const user = await requireUser(req);
-    const gate = ensureCreator(user.role);
-    if (gate) return gate;
+    if (!canUpload(principalOf(user))) {
+      return fail(403, "Your creator account isn't approved yet");
+    }
 
     const episodes = await prisma.episode.findMany({
       where: user.role === "ADMIN" ? {} : { series: { creatorId: user.id } },

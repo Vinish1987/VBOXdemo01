@@ -3,9 +3,11 @@
 //
 //   Run:  npm run db:seed
 //
-// Demo logins (password for both:  password123):
-//   viewer@vbox.test   — a normal viewer, starts with 60 VBOX Credits
-//   creator@vbox.test  — owns the catalog below (Creator Studio)
+// Demo logins (password for all:  password123):
+//   viewer@vbox.test    — a normal viewer, starts with 60 VBOX Credits
+//   creator@vbox.test   — an APPROVED creator (owns the catalog below)
+//   admin@vbox.test     — platform admin (approves creators, moderates)
+//   applicant@vbox.test — a viewer with a PENDING creator application
 
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
@@ -69,15 +71,50 @@ async function main() {
 
   // ── Users ──────────────────────────────────────────────────────
   const passwordHash = await bcrypt.hash("password123", 10);
+
+  // Admin — runs the platform.
+  await prisma.user.upsert({
+    where: { email: "admin@vbox.test" },
+    update: { role: "ADMIN" },
+    create: { email: "admin@vbox.test", name: "VBOX Admin", role: "ADMIN", passwordHash, emailVerified: new Date() },
+  });
+
+  // Approved creator — owns the catalog below.
   const creator = await prisma.user.upsert({
     where: { email: "creator@vbox.test" },
-    update: {},
-    create: { email: "creator@vbox.test", name: "Quantloop Originals", role: "CREATOR", passwordHash },
+    update: { role: "CREATOR", creatorStatus: "APPROVED" },
+    create: {
+      email: "creator@vbox.test",
+      name: "Quantloop Originals",
+      role: "CREATOR",
+      creatorStatus: "APPROVED",
+      emailVerified: new Date(),
+      passwordHash,
+    },
   });
+
+  // Normal viewer with some credits.
   await prisma.user.upsert({
     where: { email: "viewer@vbox.test" },
     update: { creditsBalance: 60 },
     create: { email: "viewer@vbox.test", name: "Demo Viewer", role: "VIEWER", passwordHash, creditsBalance: 60 },
+  });
+
+  // A pending creator applicant — so the admin approval queue isn't empty.
+  const applicant = await prisma.user.upsert({
+    where: { email: "applicant@vbox.test" },
+    update: { creatorStatus: "PENDING" },
+    create: { email: "applicant@vbox.test", name: "Riya Sharma", role: "VIEWER", creatorStatus: "PENDING", passwordHash },
+  });
+  await prisma.creatorApplication.upsert({
+    where: { userId: applicant.id },
+    update: {},
+    create: {
+      userId: applicant.id,
+      channelName: "Riya Originals",
+      pitch: "Short romantic thrillers in Hindi and Gujarati.",
+      status: "PENDING",
+    },
   });
 
   // ── Catalog ────────────────────────────────────────────────────
@@ -124,7 +161,7 @@ async function main() {
     episodes: await prisma.episode.count(),
   };
   console.log("Done:", counts);
-  console.log("Login as viewer@vbox.test / creator@vbox.test — password: password123");
+  console.log("Logins (password123): viewer@ / creator@ / admin@ / applicant@ vbox.test");
 }
 
 main()

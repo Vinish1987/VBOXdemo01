@@ -10,9 +10,13 @@
     "src/lib/ads.ts",
     "src/lib/auth.ts",
     "src/lib/playback.ts",
+    "src/lib/rbac.ts",
+    "src/lib/tokens.ts",
     "test/entitlement.test.ts",
+    "test/tokens.test.ts",
     "test/ads.test.ts",
-    "test/auth.test.ts"
+    "test/auth.test.ts",
+    "test/rbac.test.ts"
   ],
   "exclude": ["node_modules"]
 }

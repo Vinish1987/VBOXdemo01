@@ -92,6 +92,11 @@ localhost.
   Part 3; add it and redeploy.
 - **Something about the database / relation does not exist** → you haven't run
   Part 4 yet (create tables + seed).
+- **A warning about "allow-scripts" / Prisma during install, then a failed
+  build** → newer npm can skip the setup step Prisma needs. This repo now
+  includes a small `.npmrc` file that fixes it, and the build runs
+  `prisma generate` itself. If it still fails, send me the last ~8 red lines of
+  the build log.
 - **Anything else** → copy the error text from Vercel's build log and send it to
   me; these first-deploy issues are quick to fix.
 

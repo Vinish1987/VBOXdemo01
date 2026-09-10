@@ -9,14 +9,15 @@ const Body = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Use at least 8 characters"),
   name: z.string().min(1),
-  role: z.enum(["VIEWER", "CREATOR"]).optional(),
 });
 
+// Everyone signs up as a VIEWER. Becoming a creator goes through the
+// application + admin-approval flow (POST /api/creator/apply).
 export async function POST(req: Request) {
   try {
     const parsed = Body.safeParse(await req.json());
     if (!parsed.success) return fail(400, parsed.error.issues[0].message);
-    const { email, password, name, role } = parsed.data;
+    const { email, password, name } = parsed.data;
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) return fail(409, "An account with that email already exists");
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
       data: {
         email,
         name,
-        role: role ?? "VIEWER",
+        role: "VIEWER",
         passwordHash: await hashPassword(password),
       },
     });

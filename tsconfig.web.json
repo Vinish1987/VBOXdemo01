@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "jsx": "react-jsx", "types": ["node", "react"] },
+  "include": [
+    "src/lib/api.ts",
+    "src/lib/art.ts",
+    "src/components/Auth.tsx",
+    "src/components/Nav.tsx",
+    "src/app/layout.tsx",
+    "src/app/page.tsx",
+    "src/app/series/[id]/page.tsx",
+    "src/app/watch/[episodeId]/page.tsx",
+    "src/app/login/page.tsx",
+    "src/app/signup/page.tsx",
+    "src/app/plans/page.tsx",
+    "src/app/wallet/page.tsx"
+  ],
+  "exclude": ["node_modules"]
+}
