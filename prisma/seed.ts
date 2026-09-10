@@ -58,11 +58,56 @@ async function main() {
 
   // ── Ad inventory ───────────────────────────────────────────────
   const ads = [
-    { title: "Ride the Future — EV Launch", advertiser: "Volt Motors", type: "PRE_ROLL" as const, durationSec: 15, weight: 3, cpmMicros: 140000 },
-    { title: "UPI Cashback Days", advertiser: "PayNimbus", type: "PRE_ROLL" as const, durationSec: 10, weight: 2, cpmMicros: 110000 },
-    { title: "Monsoon Fashion Sale", advertiser: "Kavya Style", type: "MID_ROLL" as const, durationSec: 20, weight: 2, cpmMicros: 160000 },
-    { title: "Learn to Code in 90 Days", advertiser: "ByteCamp", type: "MID_ROLL" as const, durationSec: 15, weight: 1, cpmMicros: 130000 },
-    { title: "Order in 10 Minutes", advertiser: "QuickCart", type: "PRE_ROLL" as const, durationSec: 12, weight: 2, cpmMicros: 120000 },
+    {
+      title: "Ride the Future — EV Launch",
+      advertiser: "Volt Motors",
+      mediaUrl: "https://example.com/ads/volt-motors.mp4",
+      clickUrl: "https://example.com/volt-motors",
+      type: "PRE_ROLL" as const,
+      durationSec: 15,
+      weight: 3,
+      cpmMicros: 140000,
+    },
+    {
+      title: "UPI Cashback Days",
+      advertiser: "PayNimbus",
+      mediaUrl: "https://example.com/ads/pay-nimbus.mp4",
+      clickUrl: "https://example.com/pay-nimbus",
+      type: "PRE_ROLL" as const,
+      durationSec: 10,
+      weight: 2,
+      cpmMicros: 110000,
+    },
+    {
+      title: "Monsoon Fashion Sale",
+      advertiser: "Kavya Style",
+      mediaUrl: "https://example.com/ads/kavya-style.mp4",
+      clickUrl: "https://example.com/kavya-style",
+      type: "MID_ROLL" as const,
+      durationSec: 20,
+      weight: 2,
+      cpmMicros: 160000,
+    },
+    {
+      title: "Learn to Code in 90 Days",
+      advertiser: "ByteCamp",
+      mediaUrl: "https://example.com/ads/bytecamp.mp4",
+      clickUrl: "https://example.com/bytecamp",
+      type: "MID_ROLL" as const,
+      durationSec: 15,
+      weight: 1,
+      cpmMicros: 130000,
+    },
+    {
+      title: "Order in 10 Minutes",
+      advertiser: "QuickCart",
+      mediaUrl: "https://example.com/ads/quickcart.mp4",
+      clickUrl: "https://example.com/quickcart",
+      type: "PRE_ROLL" as const,
+      durationSec: 12,
+      weight: 2,
+      cpmMicros: 120000,
+    },
   ];
   // Ads have no natural unique key in the schema; reset + insert for a clean set.
   await prisma.adImpression.deleteMany({});
